@@ -9,9 +9,17 @@ const server = express();
 server.use(express.json());
 
 function toUpper(req, res, next) {
-    const userInfo = req.body;
+    const splitName = req.body.name.split(' ');
+    let nameArr = [];
 
-    req.upperUserInfo = { ...userInfo, name: userInfo.name.toUpperCase() }
+    for (let i = 0; i < splitName.length; i++) {
+        let capName = splitName[i].charAt(0).toUpperCase() + splitName[i].slice(1);
+
+        nameArr.push(capName);
+    }
+    let formattedName = nameArr.join(' ');
+
+    req.upperUserInfo = { ...req.body, name: formattedName };
 
     next();
 }
@@ -40,5 +48,18 @@ server.post('/users', toUpper, (req, res) => {
         })
 
 });
+
+server.put('/users/:id', toUpper, (req, res) => {
+
+    const id = req.params.id;
+    const changes = req.upperUserInfo;
+
+    userDb.update(id, changes)
+        .then(count => {
+            res.status(200).json(count);
+        })
+
+})
+
 
 module.exports = server;
