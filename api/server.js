@@ -9,9 +9,10 @@ const server = express();
 server.use(express.json());
 
 function toUpper(req, res, next) {
-    const name = req.body.name
+    const userInfo = req.body;
 
-    const upperName = name.toUpperCase();
+    req.upperUserInfo = { ...userInfo, name: userInfo.name.toUpperCase() }
+
     next();
 }
 
@@ -31,13 +32,13 @@ server.get('/users/:id', (req, res) => {
         })
 });
 
-server.post('/users', (req, res) => {
-    const userInfo = req.body;
+server.post('/users', toUpper, (req, res) => {
 
-    userDb.insert(userInfo)
+    userDb.insert(req.upperUserInfo)
         .then(idObject => {
             res.status(201).json(idObject);
         })
+
 });
 
 module.exports = server;
