@@ -55,7 +55,16 @@ server.post('/users', toUpper, (req, res) => {
 
     userDb.insert(req.upperUserInfo)
         .then(idObject => {
-            res.status(201).json(idObject);
+            userDb.get(idObject.id)
+                .then(user => {
+                    res.status(201).json(user);
+                })
+                .catch(err => {
+                    res.status(201).json({ message: "The user has been added"})
+                })
+        })
+        .catch(err => {
+            res.status(400).json({ error: "User not added. Please ensure you provide a username"})
         })
 
 });
