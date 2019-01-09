@@ -61,5 +61,14 @@ server.put('/users/:id', toUpper, (req, res) => {
 
 })
 
+server.delete('/users/:id', (req, res) => {
+    const id = req.params.id;
+
+    userDb.remove(id)
+        .then(count => {
+            res.status(200).json(count);
+        })
+});
+
 
 module.exports = server;
