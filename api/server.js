@@ -76,18 +76,39 @@ server.put('/users/:id', toUpper, (req, res) => {
 
     userDb.update(id, changes)
         .then(count => {
-            res.status(200).json(count);
+            userDb.get(id)
+                .then(user => {
+                    res.status(200).json(user);
+                })
+                .catch(err => {
+                    res.status(200).json({ message: "The user info has been updated."})
+                })
+        })
+        .catch(err => {
+            res.status(500).json({ error: "The post information could not be modified." });
         })
 
 })
 
 server.delete('/users/:id', (req, res) => {
     const id = req.params.id;
+    let deletedUser = '';
 
-    userDb.remove(id)
-        .then(count => {
-            res.status(200).json(count);
+    userDb.get(id)
+        .then(user => {
+            deletedUser = user.name
+            userDb.remove(id)
+                .then(count => {
+                    res.status(200).json({ message: `${deletedUser} has been removed.` });
+                })
+                .catch(err => {
+                    res.status(404).json({ message: "The user could not be removed." });
+                });
         })
+        .catch(err => {
+            res.status(404).json({ message: "The user with the specified ID does not exist." });
+        });
+
 });
 
 
